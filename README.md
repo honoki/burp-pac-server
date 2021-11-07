@@ -35,7 +35,7 @@ function FindProxyForURL(url, host) {
 ```
 
 To use the Burp PAC Server extension:
-1. Download `./build/libs/burp-pac-server-all.jar` from this repository;
+1. Download the JAR from [releases](./releases) in this repository;
 2. In Burp Extender, browse to your downloaded file and add the JAR;
 3. When the extension is loaded and enabled, the PAC server will spin up immediately, and the dynamic script is available on `http://localhost:37314/proxy.pac`
 4. You can now configure your favorite browser plugin to point to this script, e.g.:
