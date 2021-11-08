@@ -28,7 +28,7 @@ function FindProxyForURL(url, host) {
         }
 		
 	for (s in advanced_scope)
-		if (advanced_scope[s].enabled && shExpMatch(host, advanced_scope[s].host))
+		if (advanced_scope[s].enabled && new RegExp(t[s].host).test(host))
 			return proxy;
 	return 'DIRECT';
 }
