@@ -15,7 +15,6 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 public class BurpExtender implements IBurpExtender, IExtensionStateListener {
 
     private IBurpExtenderCallbacks callbacks;
-    private IExtensionHelpers helpers;
 	private PrintWriter stdout;
 
     public static void main(String[] args) {
@@ -27,7 +26,6 @@ public class BurpExtender implements IBurpExtender, IExtensionStateListener {
     @Override
     public void registerExtenderCallbacks(IBurpExtenderCallbacks callbacks) {
         callbacks.setExtensionName("PAC Server");
-		this.helpers = callbacks.getHelpers();
 		this.stdout = new PrintWriter(callbacks.getStdout(), true);
 		this.callbacks = callbacks;
 		
@@ -55,7 +53,7 @@ public class BurpExtender implements IBurpExtender, IExtensionStateListener {
         
     }
 
-    private static String PAC_SCRIPT = "function FindProxyForURL(url, host) {\n	var i = 'PROXY %BURP%; DIRECT', o = [''%SIMPLESCOPE%], t = %ADVANCEDSCOPE%;\n    // since browsers do no longer allow PAC script to\n    // inspect the path and query strings of HTTPS URLs,\n    // this script does all its routing based on hostname alone\n	for (s in o)\n        // for simple scope, which works with prefixes\n        // we need to strip of anything following the third /\n        // and compare to the hostname\n        if(o[s].startsWith('https:')) {\n            if (o[s].length > 0 && url.indexOf(o[s].substring(0, o[s].indexOf('/', 8))) == 0)\n			    return i;\n        } else {\n            // if http we can compare full url still:\n            if (o[s].length > 0 && url.indexOf(o[s]) == 0)\n			    return i;\n        }\n		\n	for (s in t)\n		if (t[s].enabled && shExpMatch(host, t[s].host))\n			return i;\n	return 'DIRECT';\n}";
+    private static String PAC_SCRIPT = "function FindProxyForURL(url, host) {\nvar i = 'PROXY %BURP%; DIRECT', o = [''%SIMPLESCOPE%], t = %ADVANCEDSCOPE%;\n    // since browsers do no longer allow PAC script to\n    // inspect the path and query strings of HTTPS URLs,\n    // this script does all its routing based on hostname alone\n	for (s in o)\n        // for simple scope, which works with prefixes\n        // we need to strip of anything following the third /\n        // and compare to the hostname\n        if(o[s].startsWith('https:')) {\n            if (o[s].length > 0 && url.indexOf(o[s].substring(0, o[s].indexOf('/', 8))) == 0)\n			    return i;\n        } else {\n            // if http we can compare full url still:\n            if (o[s].length > 0 && url.indexOf(o[s]) == 0)\n			    return i;\n        }\n		\n	for (s in t) \n		if (t[s].enabled && new RegExp(t[s].host).test(host))\n			return i;\n	return 'DIRECT';\n}";
 
     public class PACServerHandler extends AbstractHandler
     {
